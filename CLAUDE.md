@@ -17,10 +17,12 @@ Les scripts sont dans `nova/scripts/`. Travaille dans `travail/<REF>/` (jamais v
 ## Au début de chaque conversation : vérifier l'installation
 Lance une seule fois, sans jamais afficher les valeurs :
 ```bash
-for v in GROQ_API_KEY FISH_API_KEY REPLICATE_API_TOKEN MT_AK MT_SK; do [ -n "${!v}" ] && echo "$v ok" || echo "$v MANQUANTE"; done; which ffmpeg >/dev/null && echo "ffmpeg ok"
+for v in GROQ_API_KEY:groq FISH_API_KEY:fish REPLICATE_API_TOKEN:replicate; do n=${v%%:*}; f=~/.config/${v##*:}/.env; { [ -n "${!n}" ] || grep -q "^$n=." "$f" 2>/dev/null; } && echo "$n ok" || echo "$n MANQUANTE"; done
+for n in MT_AK MT_SK; do { [ -n "${!n}" ] || grep -q "^$n=." "$(git rev-parse --show-toplevel 2>/dev/null || pwd)/vmake-skill/scripts/.env" 2>/dev/null; } && echo "$n ok" || echo "$n MANQUANTE"; done; which ffmpeg >/dev/null && echo "ffmpeg ok"
 ```
 S'il manque quelque chose : dis à l'élève quelle étape du guide d'installation refaire (variables de l'environnement sur claude.ai/code), et arrête-toi là.
-Les variables `GROQ_API_KEY`, `FISH_API_KEY`, `REPLICATE_API_TOKEN` valent `cloud` : c'est normal, la vraie clé est un « secret réseau » ajouté par claude.ai. `MT_AK` / `MT_SK` (Vmake) sont les vraies clés.
+Dans le cloud, les variables `GROQ_API_KEY`, `FISH_API_KEY`, `REPLICATE_API_TOKEN` valent `cloud` : c'est normal, la vraie clé est un « secret réseau » ajouté par claude.ai. `MT_AK` / `MT_SK` (Vmake) sont les vraies clés.
+Sur un Mac, les clés sont dans des fichiers lisibles par l'utilisateur seul : `~/.config/groq/.env`, `~/.config/fish/.env`, `~/.config/replicate/.env` et `vmake-skill/scripts/.env` ; les scripts les lisent tout seuls.
 **Ne jamais afficher, écrire dans un fichier ni recopier une clé.**
 
 ## La vidéo source

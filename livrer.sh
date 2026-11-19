@@ -12,7 +12,14 @@ if [ -z "$cible" ]; then
     d="${d%/}"; [ -d "$d/.git" ] && [ ! -f "$d/nova/SKILL.md" ] && { cible="$d"; break; }
   done
 fi
-[ -n "$cible" ] && [ -d "$cible/.git" ] || { echo "PAS DE DÉPÔT ÉLÈVE : la session doit aussi ouvrir le dépôt « mes-videos-nova-ia » de l'élève."; exit 2; }
+if [ -z "$cible" ] || [ ! -d "$cible/.git" ]; then
+  # Sur un Mac, sans dépôt de livraison : la vidéo finie est rangée dans ~/Movies/Nova
+  if [ "$(uname)" = "Darwin" ]; then
+    dest="$HOME/Movies/Nova/$(date +%Y-%m-%d)/$(basename "${1%.*}")"; mkdir -p "$dest"; cp "$@" "$dest/"
+    echo "Livré sur ce Mac : $dest/$(basename "$1")"; exit 0
+  fi
+  echo "PAS DE DÉPÔT ÉLÈVE : la session doit aussi ouvrir le dépôt « mes-videos-nova-ia » de l'élève."; exit 2
+fi
 jour=$(date +%Y-%m-%d); nom=$(basename "${1%.*}"); dest="livraisons/$jour/$nom"
 mkdir -p "$cible/$dest"
 cp "$@" "$cible/$dest/"
